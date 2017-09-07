@@ -1,6 +1,6 @@
 # ABA problem
 
-The use of CAS has one problem to deal with.  It is called the ABA problem.  The problem arises from the **C **of **C**AS, where the **c**omparison is value based.  That is, as long as the value involved in the comparison is the same, the swap can proceed.  However, there are still occasions that fool the CAS solution we presented.  Let's see an example where three threads concurrently access the lock-free stack we presented:![](/assets/aba_example2.jpg)![](/assets/aba_example4.jpg)![](/assets/aba_example7.jpg)![](/assets/aba_example6.jpg)\(Ps: In our case, it is not necessary for the newly allocated node's content is the same as the original node, they just need to use the same memory block\)
+The use of CAS has one problem to deal with.  It is called the ABA problem.  The problem arises from the **C **of **C**AS, where the **c**omparison is value based.  That is, as long as the value involved in the comparison is the same, the swap can proceed.  However, there are still occasions that fool the CAS solution we presented.  Let's see an example where three threads concurrently access the lock-free stack we presented:![](/assets/aba_example9.jpg)\(Ps: In our case, it is not necessary for the newly allocated node's content is the same as the original node, they just need to use the same memory block\)
 
 # ABA Problem Solutions
 
