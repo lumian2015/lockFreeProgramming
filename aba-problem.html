@@ -1,0 +1,412 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>ABA problem · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="reference.html" />
+    
+    
+    <link rel="prev" href="lock-free-stack.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="lock-free-programming.html">
+            
+                <a href="lock-free-programming.html">
+            
+                    
+                    Lock free programming
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="c11-features-in-currency.html">
+            
+                <a href="c11-features-in-currency.html">
+            
+                    
+                    C11 features in concurrency
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="lock-free-stack.html">
+            
+                <a href="lock-free-stack.html">
+            
+                    
+                    Lock-free Stack
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.5" data-path="aba-problem.html">
+            
+                <a href="aba-problem.html">
+            
+                    
+                    ABA problem
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="reference.html">
+            
+                <a href="reference.html">
+            
+                    
+                    Reference
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >ABA problem</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="aba-problem">ABA problem</h1>
+<p>The use of CAS has one problem to deal with.  It is called the ABA problem.  The problem arises from the <strong>C </strong>of <strong>C</strong>AS, where the <strong>c</strong>omparison is value based.  That is, as long as the value involved in the comparison is the same, the swap can proceed.  However, there are still occasions that fool the CAS solution we presented.  Let&apos;s see an example where three threads concurrently access the lock-free stack we presented:<img src="assets/aba_example2.jpg" alt=""><img src="assets/aba_example4.jpg" alt=""><img src="assets/aba_example7.jpg" alt=""><img src="assets/aba_example6.jpg" alt="">(Ps: In our case, it is not necessary for the newly allocated node&apos;s content is the same as the original node, they just need to use the same memory block)</p>
+<h1 id="aba-problem-solutions">ABA Problem Solutions</h1>
+<p>The root solution to ABA problem is that we should defer reclamation while other threads are holding the node or we should have a way to identify the difference between the old node and the new node.</p>
+<p>There are several solutions to the ABA problem, for the details, you can see this link. <a href="https://en.wikipedia.org/wiki/ABA_problem" title="ABA problem" target="_blank">https://en.wikipedia.org/wiki/ABA_problem</a></p>
+<p>Here, I would introduce a common solution for you.</p>
+<p>A common workaround is to add extra &quot;tag&quot; or &quot;stamp&quot; word to the quantity being considered. For example, an algorithm using compare and swap on a pointer might use a &quot;tag&quot; to indicate how many times the pointer has been successfully modified. Because of this, the next compare-and-swap will fail, even if the addresses are the same, because the tag word will not match.  This is sometimes called ABA&#x2B9; since the second A is made slightly different from the first.</p>
+<p>Here , we solve the ABA problem by using the above solution. We reconstruct the stack by adding a &quot;tag&quot;:</p>
+<pre><code>typedef struct _lfstack_t
+{
+    int tag;
+    Node *head;
+}
+</code></pre><p>Every time when we use the pointer, we will increase the &quot;tag&quot; by 1.</p>
+<pre><code>void lfstack_push(_Atomic lfstack_t *lfstack, int value)
+{
+    lfstack_t next, orig = atomic_load(lfstack);
+    Node *node = malloc(sizeof(Node));
+    node-&gt;data = value;
+    do{
+        node-&gt;next = orig.head;
+        next.head = node;
+        next.tag = orig.tag+1; //increase the &quot;tag&quot;
+    }while(!atomic_compare_exchange_weak(lfstack,&amp;orig,next));
+}
+
+int lfstack_pop(_Atomic lfstack_t *lfstack)
+{
+    lfstack_t next, orig = atomic_load(lfstack);
+    do{
+       if(orig.head == NULL)
+       {
+            return -1;
+       }
+       next.head = orig.head-&gt;next;
+       next.tag = orig.tag+1; //increase the &quot;tag&quot;
+    }while(!atomic_compare_exchange_weak(lfstack,&amp;orig,next));
+    printf(&quot;poping value %d\n&quot;,orig.head-&gt;data);
+    free(orig.head);
+    return 0;
+}
+</code></pre><p>Don&apos;t forget to change the initialization of stack.</p>
+<pre><code>_Atomic lfstack_t top = {0,NULL};
+</code></pre><p>Now, when we run the program again, it will not print any error information. Here is a C library called <strong>liblfds</strong>, <a href="https://www.liblfds.org/" target="_blank">https://www.liblfds.org/</a>, a lock-free data structure library written in C. If you don&apos;t like to write the lock-free data structure by yourself, you could use this C library.</p>
+<p>Let&apos;s compare the lock-free stack with the stack implement by using mutex. Here is the code of the lock-based stack.</p>
+<p>lock_based_stack.c</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;pthread.h&gt;
+#include&lt;stdlib.h&gt;
+
+typedef struct Node{
+    int data;
+    struct Node *next;
+}Node;
+
+Node *head = NULL;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+void *push(void *input)
+{
+    for(int i=0; i&lt;100000; i++)
+    {
+        Node *node = malloc(sizeof(Node));
+        node-&gt;data = i;
+        pthread_mutex_lock(&amp;mutex);
+        node-&gt;next = head;
+        head = node;
+        //printf(&quot;pushing value %d\n&quot;,node-&gt;data);
+        pthread_mutex_unlock(&amp;mutex);
+    }
+    pthread_exit(NULL);
+}
+
+void *pop(void *input)
+{
+    for(int i=0; i&lt;100000;)
+    {
+        pthread_mutex_lock(&amp;mutex);
+        if(head ==NULL)
+        {
+            //printf(&quot;the stack is empty\n&quot;);
+            pthread_mutex_unlock(&amp;mutex);
+        }
+        else{
+            Node *pop_node = head;
+            head = head-&gt;next;
+            //printf(&quot;poping value %d\n&quot;,pop_node-&gt;data);
+            free(pop_node);
+            i++;
+            pthread_mutex_unlock(&amp;mutex);
+        }
+    }
+    pthread_exit(NULL);
+}
+
+int main()
+{
+    pthread_t tid[200];
+    for(int i=0; i&lt;100; i++)
+        pthread_create(&amp;tid[i],NULL,push,NULL);
+    for(int i=100; i&lt;200; i++)
+        pthread_create(&amp;tid[i],NULL,pop,NULL);
+    for(int i=0; i&lt;200; i++)
+        pthread_join(tid[i],NULL);
+    return 0;
+}
+</code></pre><p>I compare the lock-free stack and lock-based stack by measuring their running time. In order to compare their efficiency, I comment the &quot;printf&quot; statement in both of the programs. I use the built-in command <code>time</code> in linux to measure their running time.</p>
+<p>Here are the average results by running each of them 10 times.</p>
+<p>lock-free stack</p>
+<pre><code>real 0m2.133s
+user 0m6.140s
+sys  0m0.946s
+</code></pre><p>lock-based stack</p>
+<pre><code>real 0m2.730s
+user 0m3.594s
+sys  0m4.907s
+</code></pre><p>From the result, we could see that lock-free stack is more efficient than lock-based stack while doing the same thing.  Actually, if you pay attention to the implementation above, a lock-free stack is logically using a spin lock as well.  Moreover, recall that pthread library&apos;s mutex is also implemented using CAS.  So, why one is faster than the other?</p>
+<p>The answer is, the one that uses CAS to implement is a <strong>direct low-level implementation </strong>that uses CAS instructions, whereas the one that uses pThread is implemented <strong>using the pThread&apos;s library</strong>.  Think about the use of &quot;ls -l | less&quot; vs the use of a GUI file manager to browse a directory.  The former is efficient but primitives, more suitable for advanced users.  The latter is easier and has more overhead (e.g., rendering the GUI).  Similarly, the pThread-based stack is easier to implement (using mutex), higher-level, but incurs syscall overhead within the mutex implementation (e.g., wait() and context switch).  In contrast, the CAS one we presented above is lower-level (almost direct use of CAS instructions), direct (so that involves no sys call), but it is much more cumbersome to implement (e.g., take care of the ABA problem yourself).</p>
+<p>Therefore, lock-free implementation in essence is for advanced developers, especially, system developers, who aim for highest efficiency.  Remember, the lock-free implementation above essentially implements a spin lock <strong>implicitly </strong>and it is &quot;lock-free&quot; just because it is (high-level) <strong>mutex lock </strong>free only.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="lock-free-stack.html" class="navigation navigation-prev " aria-label="Previous page: Lock-free Stack">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="reference.html" class="navigation navigation-next " aria-label="Next page: Reference">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"ABA problem","level":"1.5","depth":1,"next":{"title":"Reference","level":"1.6","depth":1,"path":"reference.md","ref":"reference.md","articles":[]},"previous":{"title":"Lock-free Stack","level":"1.4","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"aba-problem.md","mtime":"2017-09-07T03:18:40.584Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-09-07T03:21:47.470Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

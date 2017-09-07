@@ -1,0 +1,395 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>C11 features in concurrency · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="lock-free-stack.html" />
+    
+    
+    <link rel="prev" href="lock-free-programming.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="lock-free-programming.html">
+            
+                <a href="lock-free-programming.html">
+            
+                    
+                    Lock free programming
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="c11-features-in-currency.html">
+            
+                <a href="c11-features-in-currency.html">
+            
+                    
+                    C11 features in concurrency
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="lock-free-stack.html">
+            
+                <a href="lock-free-stack.html">
+            
+                    
+                    Lock-free Stack
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="aba-problem.html">
+            
+                <a href="aba-problem.html">
+            
+                    
+                    ABA problem
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="reference.html">
+            
+                <a href="reference.html">
+            
+                    
+                    Reference
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >C11 features in concurrency</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="c11-overview">C11 Overview</h1>
+<p>C11 is an informal name for ISO/IEC 9899:2011, the current standard for the C programming language. It includes multi-threading support , which enables us higher-level programming types to deal with concurrency now. Then, let&apos;s see how to use the C11 features to design the lock-free data-structures.</p>
+<h1 id="c11-atomic-types">C11 Atomic types</h1>
+<p>C11 defines a new _Atomic type specifier. The atomic declaration syntax is like this:</p>
+<p>_Atomic (type_name) or</p>
+<p>_Atomic type_name</p>
+<p>The type_name can not be an array type, a function type, an atomic type, or a qualified type. For example, we could define an atomic integer like this:</p>
+<pre><code>_Atomic(int) a; //or
+_Atomic int b; //both of them are the atomic integer
+</code></pre><p>Please be sure to include the header &quot;#include&lt;stdatomic.h&gt;&quot; when you are using the atomic type in your program.</p>
+<p>Also, we could define a use-defined struct atomic types, which enable the struct to be manipulated atomically.</p>
+<pre><code>struct Node
+{
+    int data;
+    struct Node *next;
+};
+_Atomic struct Node s; //s is also an atomic type
+</code></pre><p>In addition to the ability to define user-defined atomic types, the _Atomic keyword makes it possible to use objects of all atomic types in nearly all the same expressions and contexts as their direct (non-atomic) counterparts.</p>
+<pre><code>_Atomic int a = 3; // initialize like a normal int type
+a = a + 2; //you can perform the atomic addition like this
+</code></pre><p>Here is a simple example of using C11 atomic type:</p>
+<p>test.c</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdatomic.h&gt;
+#include&lt;pthread.h&gt;
+
+_Atomic int acnt;
+int cnt;
+void *adding(void *input)
+{
+    for(int i=0; i&lt;10000; i++)
+    {
+        acnt++;
+        cnt++;
+    }
+    pthread_exit(NULL);
+}
+int main()
+{
+    pthread_t tid[10];
+    for(int i=0; i&lt;10; i++)
+        pthread_create(&amp;tid[i],NULL,adding,NULL);
+    for(int i=0; i&lt;10; i++)
+        pthread_join(tid[i],NULL);
+
+    printf(&quot;the value of acnt is %d\n&quot;, acnt);
+    printf(&quot;the value of cnt is %d\n&quot;, cnt);
+    return 0;
+}
+</code></pre><p>In order to compile C11 program, we need GCC4.9 or later. We should specify the parameter to tell the gcc compiler that we would like to compile the program by using C11 standard. So, the gcc command is as follows:</p>
+<pre><code>gcc -std=c11 -pthread -o test test.c
+</code></pre><p>One of the possible outputs is:</p>
+<pre><code>the value of acnt is 100000 (correct)
+the value of cnt is 89824 (wrong)
+</code></pre><h1 id="operations-on-atomic-types">Operations on atomic types</h1>
+<p>C11 provides some functions for us to change the content of atomic types like user-defined struct in an atomic way. Here I will introduce the CAS function, which we will use in lock-free data-struct designing.</p>
+<pre><code>_Bool atmoic_compare_exchange_weak(volatile A *object, C *expected, C desired);
+</code></pre><p>Description: Atomically,  compares the value pointed to by object for equality with that in expected, and if true, replaces the value  pointed to by object with desired, and if false, updates the value in expected with the value pointed to by object. (Here, <strong>A </strong>means atomic type, while the <strong>C </strong>means the non-atomic type corresponding to <strong>A</strong>, for example, <strong>if A is _Atomic int , then, C is int</strong>)</p>
+<p>The <strong>volatile</strong> is a type qualifier, like const, and is a property of the type. It indicates that a value may change between different accesses (eg: shared variable in multi-threading program), even if it does not appear to be modified. With the volatile keyword, the compiler knows a variable needs to be reread from memory at each use, and it prevents the compiler from performing optimization on code. For more information, please refer to this link:</p>
+<p><a href="http://www.geeksforgeeks.org/understanding-volatile-qualifier-c-set-1-introduction/" target="_blank">http://www.geeksforgeeks.org/understanding-volatile-qualifier-c-set-1-introduction/</a></p>
+<p>Returns: the result of the comparison, true or false.</p>
+<p>Here, we will use the function to implement a simple lock.</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdatomic.h&gt;
+#include&lt;pthread.h&gt;
+
+int lock = 0;
+int lock_count = 0;
+int unlock_count = 0;
+
+void *counting(void *input)
+{
+    int desired = 0;
+    for(int i = 0; i&lt; 100000; i++)
+    {
+        unlock_count++;
+        while(!atomic_compare_exchange_weak(&amp;lock,&amp;desired,1)) //if the lock is 0(unlock), then set it to 1(lock).
+            desired = 0; //if the CAS fails, the desired will be set to 1, so we need to change it to 0 again.
+        lock_count++; 
+        lock = 0;
+    }
+    pthread_exit(NULL);
+}
+
+int main()
+{
+    pthread_t tid[10];
+    for(int i=0; i&lt;10; i++)
+    {
+        pthread_create(&amp;tid[i],NULL,counting,NULL);
+    }
+    for(int i=0; i&lt;10; i++)
+        pthread_join(tid[i],NULL);
+
+    printf(&quot;the value of lock_count is %d\n&quot;,lock_count);
+    printf(&quot;the value of unlock_count is %d\n&quot;,unlock_count);
+}
+</code></pre><p>one of the possible outputs is:</p>
+<pre><code>the value of lock_count is 1000000 (correct)
+the value of unlock_count is 998578 (wrong)
+</code></pre><p>For more information, please refer to <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf" title="ISO/IEC 9899:2011 P273-286" target="_blank">http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf</a></p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="lock-free-programming.html" class="navigation navigation-prev " aria-label="Previous page: Lock free programming">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="lock-free-stack.html" class="navigation navigation-next " aria-label="Next page: Lock-free Stack">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"C11 features in concurrency","level":"1.3","depth":1,"next":{"title":"Lock-free Stack","level":"1.4","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"Lock free programming","level":"1.2","depth":1,"path":"lock-free-programming.md","ref":"lock-free-programming.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"c11-features-in-currency.md","mtime":"2017-09-07T03:18:40.584Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-09-07T03:21:47.470Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
