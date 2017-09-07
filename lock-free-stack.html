@@ -1,0 +1,397 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Lock-free Stack · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="aba-problem.html" />
+    
+    
+    <link rel="prev" href="c11-features-in-currency.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="lock-free-programming.html">
+            
+                <a href="lock-free-programming.html">
+            
+                    
+                    Lock free programming
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="c11-features-in-currency.html">
+            
+                <a href="c11-features-in-currency.html">
+            
+                    
+                    C11 features in concurrency
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.4" data-path="lock-free-stack.html">
+            
+                <a href="lock-free-stack.html">
+            
+                    
+                    Lock-free Stack
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="aba-problem.html">
+            
+                <a href="aba-problem.html">
+            
+                    
+                    ABA problem
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="reference.html">
+            
+                <a href="reference.html">
+            
+                    
+                    Reference
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Lock-free Stack</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="writing-a-lock-free-stack">Writing a Lock-free Stack</h1>
+<p>Stack is a last in, first out(LIFO) data-structure. We will implement a linked list lock-free stack by using the C11 knowledge we learnt before.</p>
+<p>Let&apos;s see the process of pushing a node into a stack.</p>
+<p><img src="assets/import.png" alt=""></p>
+<p>This works fine in a single-threaded context, but if other threads are also modifying the stack, it&#x2019;s not enough. Let&apos;s see what would happen if two threads push a node into the stack concurrently.</p>
+<p><img src="assets/stack_error.png" alt=""></p>
+<p>OK, so what can you do about this nasty race condition in a lock-free data-structure? The answer is to use an atomic compare and swap(CAS) operation when you want to set the head node to point to your new node to ensure that head hasn&#x2019;t been modified since you read it. If it has, you can loop and try again.</p>
+<p>stack.h</p>
+<pre><code>1   #include&lt;stdio.h&gt;
+2   #include&lt;stdatomic.h&gt;
+3   #include&lt;stdlib.h&gt;
+4  
+5   //the node type in the stack
+6   typedef struct _Node
+7   {
+8       int data;
+9       struct _Node* next;
+10  }Node;
+11  //the stack
+12  typedef struct _lfstack_t
+13  {
+14      Node *head;
+15  }lfstack_t;
+16 
+17  //the push function
+18  void lfstack_push(_Atomic lfstack_t *lfstack, int value)
+19  {
+20      lfstack_t next;
+21      lfstack_t orig = atomic_load(lfstack); //here we need a local copy of lfstack, however, lfstack is a pointer
+22                                             //we could not get the content from a struct pointer atomically by assignment
+23                                             //C11 provides us a function for us to atomically get the content from the location that 
+24                                             //a atomic type pointer points to.
+25      Node *node = malloc(sizeof(Node)); //the new node, step 1
+26      node-&gt;data = value;
+27      do{
+28          node-&gt;next = orig.head; //step 2
+29          next.head = node; //local change of head
+30      }while(!atomic_compare_exchange_weak(lfstack,&amp;orig,next)); //if the lfstack is not changed by others, apply the local change of head to it
+31  }
+</code></pre><p>The pop function is also the same way of analyzing, and we let the analysis for students. Here is the pop function:</p>
+<p>stack.h</p>
+<pre><code>1   //pop function
+2   int lfstack_pop(_Atomic lfstack_t *lfstack)
+3   {
+4       lfstack_t next;
+5       lfstack_t orig = atomic_load(lfstack);
+6       do{
+7           if(orig.head == NULL) //return when the stack is empty
+8           {
+9               return -1;
+10          }
+11          next.head = orig.head-&gt;next; //set the head to the next node
+12      }while(!atomic_compare_exchange_weak(lfstack,&amp;orig,next)); //if the head of stack is not changed, update the stack
+13      printf(&quot;poping value %d\n&quot;,orig.head-&gt;data); //just want to see the poping value.
+14      free(orig.head); // free the poping node
+15      return 0;
+16  }
+</code></pre><p>Next, we put the lock-free stack in a multi-threading enviroment to be accessed as a shared data-structure.</p>
+<p>main.c</p>
+<pre><code>1   #include &quot;stack.h&quot;
+2   #include &lt;stdio.h&gt;
+3   #include &lt;pthread.h&gt;
+4   _Atomic lfstack_t top = {NULL};
+5   void *push(void *input)
+6   {
+7       for(int i=0; i&lt;100000; i++)
+8       {
+9           lfstack_push(&amp;top, i);
+10          printf(&quot;push %d\n&quot;,i);
+11      }    
+12      pthread_exit(NULL);
+13  }
+14
+15  void *pop(void *input)
+16  {
+17      for(int i=0; i&lt;100000;)
+18      {
+19          int result;
+20          result = lfstack_pop(&amp;top);
+21          if(result == -1)
+22              printf(&quot;the stack is empty\n&quot;);
+23          else
+24          {
+25              i++;
+26          }
+27
+28      }
+29      pthread_exit(NULL);
+30  }
+31  int main()
+32  {
+33      pthread_t tid[200];
+34      for(int i=0; i&lt;100; i++)
+35          pthread_create(&amp;tid[i],NULL,push,NULL);
+36      for(int i=100; i&lt;200; i++)
+37          pthread_create(&amp;tid[i],NULL,pop,NULL);
+38      for(int i=0; i&lt;200; i++)
+39          pthread_join(tid[i],NULL);  
+40      return 0;
+41  }
+</code></pre><p>Actually, the print statement is not run together after they push/pop a node, so you may not see the print results as a LIFO logic, but I think you could understand it. We should compile the program by using the command:</p>
+<pre><code>gcc -std=c11 -pthread -o main main.c
+</code></pre><p>The program seems perfect, but the program will abort when you run it. Here is a underlying problem that you may not notice, it is called ABA problem and I will introduce it to you next.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="c11-features-in-currency.html" class="navigation navigation-prev " aria-label="Previous page: C11 features in concurrency">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="aba-problem.html" class="navigation navigation-next " aria-label="Next page: ABA problem">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Lock-free Stack","level":"1.4","depth":1,"next":{"title":"ABA problem","level":"1.5","depth":1,"path":"aba-problem.md","ref":"aba-problem.md","articles":[]},"previous":{"title":"C11 features in concurrency","level":"1.3","depth":1,"path":"c11-features-in-currency.md","ref":"c11-features-in-currency.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"lock-free-stack.md","mtime":"2017-09-07T03:18:40.588Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-09-07T05:22:18.641Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
