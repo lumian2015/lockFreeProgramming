@@ -157,9 +157,9 @@ Therefore, lock-free implementation in essence is for advanced developers, espec
 So, given a piece of code, how do you know if it's lock-based or lock-free? Let's first see two examples.
 
 ```
-do{
-    val = *addr;
-}atomic_compare_exchange_weak(addr, &val, val+1);
+1 do{
+2     val = *addr;
+3 }atomic_compare_exchange_weak(addr, &val, val+1);
 ```
 
 This is lock-free, just like the examples we have seen before.
@@ -167,15 +167,25 @@ This is lock-free, just like the examples we have seen before.
 Here, it is the version of spin-lock for the same purpose.
 
 ```
-//just the pseudo-code, you could see "C11 features in concurrency" for a specific example
-while(!atomic_compare_exchange_weak(lock, unlock_val, lock_val));
-*addr = *addr + 1;
-*lock = unlock_val;
+//just the pseudo-code, you could see "C11 features in concurrency" for a specified example
+1 while(!atomic_compare_exchange_weak(lock, unlock_val, lock_val));
+2 *addr = *addr + 1;
+3 *lock = unlock_val;
 ```
 
 They're both loops, and very similarly-looking ones. Moreover, we can get stuck at both loops for an indefinite period of time. How come they're at the opposite sides of the locking/lock-free distinction?! Where's the difference?
 
-**The difference is in whether we get stuck if another thread gets suspended.**
+**The difference is in whether some threads get stuck if another thread gets suspended.**
 
-The first loop – the lock free – never gets stuck because of another thread being suspended. If some threads else being suspended, others would still make progress to do the atomic addition. On the contrary, it will finish faster.![](/assets/lock-free.PNG)The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.![](/assets/lock-based.PNG)So, the main difference between lock-based or lock-free program is not in whether a program use a specific "lock" or something else. You just need to check if any thread is blocked when some threads get suspended. If yes, it is lock-based, otherwise, it is lock-free.
+The first loop – the lock free – never gets stuck because of another thread being suspended at **anywhere**. If some threads being suspended, others would still make progress to do the atomic addition. On the contrary, it will finish faster.![](/assets/lock-free.PNG)
+
+Let's supposed there are two threads modify the value of _\*addr_ concurrently. Through the above image, we could see that thread 1 and thread 2 both get the same local copy of _\*addr\(0\)_, and thread 1 updates the value first and then gets suspended for a very long time. Through the definition of CAS, we could easily know that thread 2 would fail the CAS because the value of _\*addr_ has been change to 1, then thread 2 do the some calculation again, keep adding 1 to_ \*addr_ no matter how long the thread 1 is suspended.
+
+The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.
+
+![](/assets/lock-based.PNG)
+
+As the same, let's supposed there are two threads modify the value of _\*addr_ concurrently. Through the above image, we could see that thread 1 get the lock first and update the value of _\*addr_. However, before it changes the state of lock, it gets suspended! While at the same time, thread 2 could just keep looping, testing the CAS and failing again and again. So, if thread 1 gets suspended for a very very long time, the thread 2 would be blocked and the value of _\*addr_ would being 1 forever. This is very different from the lock-free example!
+
+So, the main difference between lock-based or lock-free program is not whether a program use a specific "lock" or something else. You just need to check if any thread is blocked when some threads get suspended. If yes, it is lock-based, otherwise, it is lock-free.
 
