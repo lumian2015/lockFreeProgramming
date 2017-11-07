@@ -167,7 +167,7 @@ This is lock-free, just like the examples we have seen before.
 Here, it is the version of spin-lock for the same purpose.
 
 ```
-//just the pseudo-code, you could see "C11 features in concurrency" for a specified example
+//just the pseudo-code, you could see "C11 features in concurrency" for a specific example
 while(!atomic_compare_exchange_weak(lock, unlock_val, lock_val));
 *addr = *addr + 1;
 *lock = unlock_val;
@@ -177,5 +177,5 @@ They're both loops, and very similarly-looking ones. Moreover, we can get stuck 
 
 **The difference is in whether we get stuck if another thread gets suspended.**
 
-The first loop – the lock free – never gets stuck because of another thread being suspended. If some threads else being suspended, others would still make progress to do the atomic addition. On the contrary, it will finish faster.![](/assets/lock-free.PNG)The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.![](/assets/lock-based.PNG)So, the main difference between lock-based or lock-free program is not whether a program use a specific "lock" or something else. You just need to check if any thread is blocked when some threads get suspended. If yes, it is lock-based, otherwise, it is lock-free.
+The first loop – the lock free – never gets stuck because of another thread being suspended. If some threads else being suspended, others would still make progress to do the atomic addition. On the contrary, it will finish faster.![](/assets/lock-free.PNG)The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.![](/assets/lock-based.PNG)So, the main difference between lock-based or lock-free program is not in whether a program use a specific "lock" or something else. You just need to check if any thread is blocked when some threads get suspended. If yes, it is lock-based, otherwise, it is lock-free.
 
