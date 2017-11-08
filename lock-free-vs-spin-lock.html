@@ -230,8 +230,8 @@
 <pre><code>1  #inlcude&lt;stdio.h&gt;
 2  #include&lt;stdatomic.h&gt;
 3  #include&lt;pthread.h&gt;
-4  _Atomic int num_circulations = 0; //record how many circulations the program has done in the while loop
-5  int addr = 0;
+4  _Atomic int num_circulations = 0; //record how many circulations the program 
+5  int addr = 0;                     //has done in the while loop
 6  void *adding(void *input)
 7  {
 8      int val;
@@ -259,8 +259,8 @@
 <pre><code>1  #include&lt;stdio.h&gt;
 2  #include&lt;stdatomic.h&gt;
 3  #include&lt;pthread.h&gt;
-4  _Atomic int num_circulations = 0; //record how many circulations the program has done in the while loop
-5  int addr = 0;
+4  _Atomic int num_circulations = 0; //record how many circulations the program 
+5  int addr = 0;                     //has done in the while loop
 6  int lock = 0;
 7  void *adding(void *input)
 8  {
@@ -359,7 +359,7 @@ sys  0m0.012s
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"lock-free vs spin-lock","level":"1.4","depth":1,"next":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"C11 features in concurrency","level":"1.3","depth":1,"path":"c11-features-in-currency.md","ref":"c11-features-in-currency.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"lock-free-vs-spin-lock.md","mtime":"2017-11-08T14:40:58.712Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-08T14:41:05.217Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"lock-free vs spin-lock","level":"1.4","depth":1,"next":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"C11 features in concurrency","level":"1.3","depth":1,"path":"c11-features-in-currency.md","ref":"c11-features-in-currency.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"lock-free-vs-spin-lock.md","mtime":"2017-11-08T14:48:54.428Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-08T14:49:01.368Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
