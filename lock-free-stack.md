@@ -10,7 +10,7 @@ This works fine in a single-threaded context, but if other threads are also modi
 
 ![](/assets/stack_error.png)
 
-OK, so what can you do about this nasty race condition in a lock-free data-structure? The answer is to use an atomic compare and swap\(CAS\) operation when you want to set the head node to point to your new node to ensure that head hasn’t been modified since you read it. If it has, you can loop and try again.
+OK, so what can you do about this nasty race condition in a lock-free data-structure? The answer is to use an atomic compare and swap\(CAS\) operation to set the head node to point to your new node when CAS is sure that the head hasn’t been modified since you last read it. If it has, you can loop and try again.
 
 stack.h
 

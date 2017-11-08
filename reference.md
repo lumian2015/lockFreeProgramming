@@ -28,3 +28,11 @@ Hazard pointers: safe memory reclamation for lock-free objects:
 
 [http://ieeexplore.ieee.org/document/1291819/\#full-text-section](http://ieeexplore.ieee.org/document/1291819/#full-text-section)
 
+It's "locking" if it's blocking
+
+[https://yosefk.com/blog/its-locking-if-its-blocking.html](https://yosefk.com/blog/its-locking-if-its-blocking.html)
+
+Do lock-free algorithms really perform better than their lock-full counterparts?
+
+[https://stackoverflow.com/questions/5680869/do-lock-free-algorithms-really-perform-better-than-their-lock-full-counterparts/](https://stackoverflow.com/questions/5680869/do-lock-free-algorithms-really-perform-better-than-their-lock-full-counterparts/)
+

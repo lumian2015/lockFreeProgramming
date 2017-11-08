@@ -1,6 +1,6 @@
 # ABA problem
 
-The use of CAS has one problem to deal with.  It is called the ABA problem.  The problem arises from the **C **of **C**AS, where the **c**omparison is value based.  That is, as long as the value involved in the comparison is the same, the swap can proceed.  However, there are still occasions that fool the CAS solution we presented.  Let's see an example where three threads concurrently access the lock-free stack we presented:![](/assets/aba_example2.jpg)![](/assets/aba_example4.jpg)![](/assets/aba_example9.jpg)\(Ps: In our case, it is not necessary for the newly allocated node's content is the same as the original node, they just need to use the same memory block\)
+The use of CAS has one problem to deal with.  It is called the ABA problem.  The problem arises from the **C **of **C**AS, where the **c**omparison is value based.  That is, as long as the value involved in the comparison is the same, the swap can proceed.  However, there are still occasions that fool the CAS solution we presented.  Let's see an example where three threads concurrently access the lock-free stack we presented:![](/assets/aba_example9.jpg)\(Ps: In our case, it is not necessary for the newly allocated node's content is the same as the original node, they just need to use the same memory block\)
 
 # ABA Problem Solutions
 
@@ -153,39 +153,4 @@ From the result, we could see that lock-free stack is more efficient than lock-b
 The answer is, the one that uses CAS to implement is a **direct low-level implementation **that uses CAS instructions, whereas the one that uses pThread is implemented **using the pThread's library**.  Think about the use of "ls -l \| less" vs the use of a GUI file manager to browse a directory.  The former is efficient but primitives, more suitable for advanced users.  The latter is easier and has more overhead \(e.g., rendering the GUI\).  Similarly, the pThread-based stack is easier to implement \(using mutex\), higher-level, but incurs syscall overhead within the mutex implementation \(e.g., wait\(\) and context switch\).  In contrast, the CAS one we presented above is lower-level \(almost direct use of CAS instructions\), direct \(so that involves no sys call\), but it is much more cumbersome to implement \(e.g., take care of the ABA problem yourself\).
 
 Therefore, lock-free implementation in essence is for advanced developers, especially, system developers, who aim for highest efficiency.  Remember, the lock-free implementation above essentially implements a spin lock **implicitly **and it is "lock-free" just because it is \(high-level\) **mutex lock **free only.
-
-So, given a piece of code, how do you know if it's lock-based or lock-free? Let's first see two examples.
-
-```
-1 do{
-2     val = *addr;
-3 }atomic_compare_exchange_weak(addr, &val, val+1);
-```
-
-This is lock-free, just like the examples we have seen before.
-
-Here, it is the version of spin-lock for the same purpose.
-
-```
-//just the pseudo-code, you could see "C11 features in concurrency" for a specified example
-1 while(!atomic_compare_exchange_weak(lock, unlock_val, lock_val));
-2 *addr = *addr + 1;
-3 *lock = unlock_val;
-```
-
-They're both loops, and very similarly-looking ones. Moreover, we can get stuck at both loops for an indefinite period of time. How come they're at the opposite sides of the locking/lock-free distinction?! Where's the difference?
-
-**The difference is in whether some threads get stuck if another thread gets suspended.**
-
-The first loop – the lock free – never gets stuck because of another thread being suspended at **anywhere**. If some threads being suspended, others would still make progress to do the atomic addition. On the contrary, it will finish faster.![](/assets/lock-free.PNG)
-
-Let's supposed there are two threads modify the value of _\*addr_ concurrently. Through the above image, we could see that thread 1 and thread 2 both get the same local copy of _\*addr\(0\)_, and thread 1 updates the value first and then gets suspended for a very long time. Through the definition of CAS, we could easily know that thread 2 would fail the CAS because the value of _\*addr_ has been changed to 1, then thread 2 does the some calculation again, keeps adding 1 to_ \*addr_ no matter how long the thread 1 is suspended.
-
-The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.
-
-![](/assets/lock-based.PNG)
-
-As the same, let's supposed there are two threads modify the value of _\*addr_ concurrently. Through the above image, we could see that thread 1 gets the lock first and updates the value of _\*addr_. However, before it changes the state of lock, it gets suspended! While at the same time, thread 2 could just keep looping, testing the CAS and failing again and again. So, if thread 1 gets suspended for a very very long time, the thread 2 would be blocked and the value of _\*addr_ would being 1 forever. This is very different from the lock-free example!
-
-So, the main difference between lock-based or lock-free program is not whether a program use a specific "lock" or something else. You just need to check if any thread is blocked when some threads get suspended. If yes, it is lock-based, otherwise, it is lock-free.
 
