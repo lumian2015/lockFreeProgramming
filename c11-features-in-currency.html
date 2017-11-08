@@ -57,7 +57,7 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="lock-free-stack.html" />
+    <link rel="next" href="lock-free-vs-spin-lock.html" />
     
     
     <link rel="prev" href="lock-free-programming.html" />
@@ -128,7 +128,20 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4" data-path="lock-free-stack.html">
+        <li class="chapter " data-level="1.4" data-path="lock-free-vs-spin-lock.html">
+            
+                <a href="lock-free-vs-spin-lock.html">
+            
+                    
+                    lock-free vs spin-lock
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="lock-free-stack.html">
             
                 <a href="lock-free-stack.html">
             
@@ -141,7 +154,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5" data-path="aba-problem.html">
+        <li class="chapter " data-level="1.6" data-path="aba-problem.html">
             
                 <a href="aba-problem.html">
             
@@ -154,7 +167,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.6" data-path="reference.html">
+        <li class="chapter " data-level="1.7" data-path="reference.html">
             
                 <a href="reference.html">
             
@@ -284,12 +297,12 @@ int unlock_count = 0;
 
 void *counting(void *input)
 {
-    int desired = 0;
+    int expected = 0;
     for(int i = 0; i&lt; 100000; i++)
     {
         unlock_count++;
-        while(!atomic_compare_exchange_weak(&amp;lock,&amp;desired,1)) //if the lock is 0(unlock), then set it to 1(lock).
-            desired = 0; //if the CAS fails, the desired will be set to 1, so we need to change it to 0 again.
+        while(!atomic_compare_exchange_weak(&amp;lock,&amp;expected,1)) //if the lock is 0(unlock), then set it to 1(lock).
+            expected = 0; //if the CAS fails, the desired will be set to 1, so we need to change it to 0 again.
         lock_count++; 
         lock = 0;
     }
@@ -345,7 +358,7 @@ the value of unlock_count is 998578 (wrong)
                 </a>
                 
                 
-                <a href="lock-free-stack.html" class="navigation navigation-next " aria-label="Next page: Lock-free Stack">
+                <a href="lock-free-vs-spin-lock.html" class="navigation navigation-next " aria-label="Next page: lock-free vs spin-lock">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -356,7 +369,7 @@ the value of unlock_count is 998578 (wrong)
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"C11 features in concurrency","level":"1.3","depth":1,"next":{"title":"Lock-free Stack","level":"1.4","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"Lock free programming","level":"1.2","depth":1,"path":"lock-free-programming.md","ref":"lock-free-programming.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"c11-features-in-currency.md","mtime":"2017-09-07T03:18:40.584Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-07T14:59:51.882Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"C11 features in concurrency","level":"1.3","depth":1,"next":{"title":"lock-free vs spin-lock","level":"1.4","depth":1,"path":"lock-free-vs-spin-lock.md","ref":"lock-free-vs-spin-lock.md","articles":[]},"previous":{"title":"Lock free programming","level":"1.2","depth":1,"path":"lock-free-programming.md","ref":"lock-free-programming.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"c11-features-in-currency.md","mtime":"2017-11-08T14:30:05.344Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-08T14:30:14.474Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
