@@ -6,7 +6,7 @@ So, given a piece of code, how do you know if it's lock-based or lock-free? Let'
 1  #inlcude<stdio.h>
 2  #include<stdatomic.h>
 3  #include<pthread.h>
-4  _Atomic int num_circulations = 0; //just want to record how many circulations the program has done in the while loop
+4  _Atomic int num_circulations = 0; //record how many circulations the program has done in the while loop
 5  int addr = 0;
 6  void *adding(void *input)
 7  {
@@ -39,7 +39,7 @@ Here, it is the version of spin-lock for the same purpose.
 1  #include<stdio.h>
 2  #include<stdatomic.h>
 3  #include<pthread.h>
-4  _Atomic int num_circulations = 0; //just want to record how many circulations the program has done in the while loop
+4  _Atomic int num_circulations = 0; //record how many circulations the program has done in the while loop
 5  int addr = 0;
 6  int lock = 0;
 7  void *adding(void *input)
