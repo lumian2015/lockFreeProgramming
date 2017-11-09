@@ -69,7 +69,7 @@ Here, it is the version of spin-lock for the same purpose.
 31 }
 ```
 
-Let's see the addition part of both programs.\(For the lock-free program, it is the code from line 11 to 14, for the spin-lock program, it is the code from line 12 to 18\) They're both loops, and very similarly-looking ones. Moreover, we can loop at both loops for an period of time. How come they're at the opposite sides of the locking/lock-free distinction?! Where's the difference?
+Let's see the addition part of both programs.\(For the lock-free program, it is the code from line 11 to 14, for the spin-lock program, it is the code from line 12 to 18\) They're both loops, and very similarly-looking ones. Moreover, we can loop at both loops for a period of time. How come they're at the opposite sides of the locking/lock-free distinction?! Where's the difference?
 
 The important difference is that _**lock-free programs**_** are guaranteed to make progress. **With a lock or spin lock,  the poor thread that can't acquire the lock **can do nothing except **_**wait** _\(either via a busy wait or an OS-assisted sleep\). If the thread that holding the lock gets suspended suddently, no thread could make progress to the program.
 
