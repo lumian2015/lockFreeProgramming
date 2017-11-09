@@ -73,7 +73,7 @@ Let's see the addition part of both programs.\(For the lock-free program, it is 
 
 The important difference is that _**lock-free programs**_** are guaranteed to make progress. **With a lock or spin lock,  the poor thread that can't acquire the lock **can do nothing except **_**wait** _\(either via a busy wait or an OS-assisted sleep\). If the thread that holding the lock gets suspended suddenly, no thread could make progress to the program.
 
-The lock-free loop, although it is also need to loop again when it fails to update the value of addr. However, every time it would guarantee at least one thread to make progress. Even though some threads get suspended suddenly at anywhere, other threads could still make progress to do the addition.
+The lock-free loop, although it also needs to loop again when it fails to update the value of addr. However, every time it would guarantee at least one thread to make progress. Even though some threads get suspended suddenly at anywhere, other threads could still make progress to do the addition.
 
 ![](/assets/lock-free.PNG)
 
