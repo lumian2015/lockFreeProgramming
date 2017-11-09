@@ -75,13 +75,13 @@ The important difference is that _**lock-free programs**_** are guaranteed to ma
 
 The lock-free loop, although it also needs to loop again when it fails to update the value of addr. However, every time it would guarantee at least one thread to make progress. Even though some threads get suspended suddenly at anywhere, other threads could still make progress to do the addition.
 
-![](/assets/lock-free.PNG)![](/assets/lock-free.PNG)
+![](/assets/lock-free.PNG)
 
 Let's suppose there are two threads modify the value of _\*addr_ concurrently. Through the above image\(we omit some unimportant operations\), we could see that thread 1 and thread 2 both get the same local copy of _\*addr\(0\)_, and thread 1 updates the value first and then gets suspended for a very long time. Through the definition of CAS, we could easily know that thread 2 would fail the CAS because the value of _\*addr_ has been changed to 1, then thread 2 does the same calculation again, keeps adding 1 to_ \*addr_ no matter how long the thread 1 is suspended.
 
 The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owns the lock, other threads could just do nothing but keep looping and make no progress to the addition.
 
-![](/assets/lock-based.PNG)![](/assets/lock-based.PNG)
+![](/assets/lock-based.PNG)
 
 As the same, let's suppose there are two threads modify the value of _\*addr_ concurrently. Through the above image, we could see that thread 1 gets the lock first and updates the value of _\*addr_. However, before it changes the state of lock, it gets suspended! While at the same time, thread 2 could just keep looping, testing the CAS and failing again and again. So, if thread 1 gets suspended for a very very long time, the thread 2 would be blocked and the value of _\*addr_ would being 1 forever. This is very different from the lock-free example!
 
