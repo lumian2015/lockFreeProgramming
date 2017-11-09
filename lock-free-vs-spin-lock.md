@@ -29,7 +29,7 @@ So, given a piece of code, how do you know if it's lock-based or lock-free? Let'
 24     for(int i=0; i<10; i++)
 25         pthread_join(tid[i], NULL);
 26     printf("the value of addr is %d\n", addr);
-27     printf("the value of num_circulations is %d\n", num_circulation);
+27     printf("the value of num_circulations is %d\n", num_circulations);
 28 }
 ```
 
@@ -77,9 +77,9 @@ The lock-free loop, although it is also need to loop again when it fails to upda
 
 ![](/assets/lock-free.PNG)
 
-Let's suppose there are two threads modify the value of _\*addr_ concurrently. Through the above image\(we omit some unimportant operations\), we could see that thread 1 and thread 2 both get the same local copy of _\*addr\(0\)_, and thread 1 updates the value first and then gets suspended for a very long time. Through the definition of CAS, we could easily know that thread 2 would fail the CAS because the value of _\*addr_ has been change to 1, then thread 2 do the same calculation again, keep adding 1 to_ \*addr_ no matter how long the thread 1 is suspended.
+Let's suppose there are two threads modify the value of _\*addr_ concurrently. Through the above image\(we omit some unimportant operations\), we could see that thread 1 and thread 2 both get the same local copy of _\*addr\(0\)_, and thread 1 updates the value first and then gets suspended for a very long time. Through the definition of CAS, we could easily know that thread 2 would fail the CAS because the value of _\*addr_ has been changed to 1, then thread 2 does the same calculation again, keeps adding 1 to_ \*addr_ no matter how long the thread 1 is suspended.
 
-The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owning the lock, other threads could just do nothing but keep looping and make no progress to the addition.
+The second loop – the spin lock – will very much get stuck if another thread obtains the lock and then gets suspended before releasing it. During the suspended time of that thread who owns the lock, other threads could just do nothing but keep looping and make no progress to the addition.
 
 ![](/assets/lock-based.PNG)
 
