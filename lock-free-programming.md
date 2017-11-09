@@ -8,7 +8,7 @@ Lock-free programming has the following advantages:
 
 * Can be used in places where locks must be avoided, such as interrupt handlers
 * Avoid the troubles with blocking, such as deadlock and priority inversion
-* Improve preformance on a multi-core processor
+* Improve performance on a multi-core processor
 
 Now, let's begin to design the lock-free data-structure.
 

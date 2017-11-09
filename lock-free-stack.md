@@ -71,7 +71,7 @@ stack.h
 16  }
 ```
 
-Next, we put the lock-free stack in a multi-threading enviroment to be accessed as a shared data-structure.
+Next, we put the lock-free stack in a multi-threading environment to be accessed as a shared data-structure.
 
 main.c
 
