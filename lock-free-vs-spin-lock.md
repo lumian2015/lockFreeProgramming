@@ -93,21 +93,25 @@ From the above result, we could see that lock-free program is better than spin-l
 
 Let's first see an example.
 
-```
-                 lock-free                                                    lock-based
-```
+   lock-free
 
-![](/assets/lock-free.PNG)![](/assets/lock-based-lose.PNG)
+![](/assets/lock-free win.PNG)
+
+lock-based
+
+![](/assets/lock-based-lose.PNG)
 
 There are 4 threads modify the shared variable _count_, and they try to get access to the shared variable _count_ and do the addition on it. From the above two images, we could see that in lock-free program, while thread 1 is accessing the shared variable _count_, other threads could also get access to the _count_. However, for the lock-based program, while thread 1is accessing the shared variable _count_, it holds the lock so other threads could not access the _count_ but looping. So, here, we could see the difference between them. For the lock-free program, every thread could get access to the shared object no matter whether another thread is accessing the shared object or not.\(Although sometimes, there could be some conflicts\(just like thread 1\), and the thread should redo its work. \) However, for the lock-based program, if one thread is accessing the shared object, other threads would be blocked and have no way to get access to the shared object. Also, from the above images, we could also know why the above lock-free program is quicker than lock-based program.
 
 However, does lock-free program always perform better than lock-based program? Let's see an example.
 
-```
-                 lock-free                                                    lock-based
-```
+lock-free
 
-![](/assets/lock-free-lose.PNG)![](/assets/lock-based win.PNG)
+![](/assets/lock-free win.PNG)
+
+lock-based
+
+![](/assets/lock-based win.PNG)
 
 In the above examples, we could see that the progress of lock-based program is quicker than lock-free program. So, it is not necessary that lock-free program always perform better than lock-based program.
 
