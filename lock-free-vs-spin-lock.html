@@ -253,7 +253,7 @@
 24         pthread_join(tid[i], NULL);
 25     printf(&quot;the value of count is %d\n&quot;, count);
 26 }
-</code></pre><p>Here, it is the version of spin-lock for the same purpose.</p>
+</code></pre><p>Here is the version of spin-lock for the same purpose.</p>
 <pre><code>1  #include&lt;stdio.h&gt;
 2  #include&lt;stdatomic.h&gt;
 3  #include&lt;pthread.h&gt;
@@ -298,19 +298,19 @@ Below is the running time:
 real 0m3.755s
 user 0m14.820s
 sys  0m0.012s
-</code></pre><p>From the above result, we could see that lock-free program is better than spin-lock program because lock-free program uses less running time. Let&apos;s see the addition part of both programs.(For the lock-free program, it is the code from line 11 to 13, for the spin-lock program, it is the code from line 12 to 15) They&apos;re both loops, and very similarly-looking ones. Moreover, we can loop at both loops for a period of time. How come they&apos;re at the opposite sides of the locking/lock-free distinction?! Does lock-free program really perform better than lock-based program?</p>
+</code></pre><p>From the above result, we could see that lock-free program is better than spin-lock program. Let&apos;s see the addition part of both programs.(For the lock-free program, it is the code from line 11 to 13, for the spin-lock program, it is the code from line 12 to 15) They&apos;re both loops, and very similarly-looking ones. Moreover, we can loop at both loops for a period of time. How come they&apos;re at the opposite sides of the locking/lock-free distinction?! Does lock-free program really perform better than lock-based program?</p>
 <p>Let&apos;s first see an example.</p>
-<p>   lock-free</p>
-<p><img src="assets/lock-free win.PNG" alt=""></p>
+<p>lock-free</p>
+<p><img src="assets/lock-free-win.PNG" alt=""></p>
 <p>lock-based</p>
-<p><img src="assets/lock-based-lose.PNG" alt=""></p>
-<p>There are 4 threads modify the shared variable <em>count</em>, and they try to get access to the shared variable <em>count</em> and do the addition on it. From the above two images, we could see that in lock-free program, while thread 1 is accessing the shared variable <em>count</em>, other threads could also get access to the <em>count</em>. However, for the lock-based program, while thread 1is accessing the shared variable <em>count</em>, it holds the lock so other threads could not access the <em>count</em> but looping. So, here, we could see the difference between them. For the lock-free program, every thread could get access to the shared object no matter whether another thread is accessing the shared object or not.(Although sometimes, there could be some conflicts(just like thread 1), and the thread should redo its work. ) However, for the lock-based program, if one thread is accessing the shared object, other threads would be blocked and have no way to get access to the shared object. Also, from the above images, we could also know why the above lock-free program is quicker than lock-based program.</p>
+<p><img src="assets/lock-based lose.PNG" alt=""></p>
+<p>There are 4 threads modify the shared variable <em>count</em>, and they try to get access to the shared variable <em>count</em> and do the addition on it. From the above two images, we could see that in lock-free program, while thread 1 is accessing the shared variable <em>count</em>, other threads could also get access to the <em>count _and make progress for the program. However, for the lock-based program, while thread 1 is accessing the shared variable _count</em>, it holds the lock and other threads could not access the <em>count</em> but busy-waiting. So, here, we could see the difference between them. For the lock-free program, every thread could get access to the shared object no matter whether another thread is accessing the shared object or not.(Although sometimes, there could be some conflicts(just like thread 1), and the thread should redo its work. ) However, for the lock-based program, if one thread is accessing the shared object, other threads would be blocked and have no way to get access to the shared object. Also, from the above images, we could also know why the above lock-free program is quicker than lock-based program.</p>
 <p>However, does lock-free program always perform better than lock-based program? Let&apos;s see an example.</p>
 <p>lock-free</p>
-<p><img src="assets/lock-free win.PNG" alt=""></p>
+<p><img src="assets/lock-free-win.PNG" alt=""></p>
 <p>lock-based</p>
 <p><img src="assets/lock-based win.PNG" alt=""></p>
-<p>In the above examples, we could see that the progress of lock-based program is quicker than lock-free program. So, it is not necessary that lock-free program always perform better than lock-based program.</p>
+<p>In the above images, we could see that the progress of lock-based program is quicker than lock-free program. So, it is not necessary that lock-free program always performs better than lock-based program.</p>
 
                                 
                                 </section>
@@ -354,7 +354,7 @@ sys  0m0.012s
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"lock-free vs spin-lock","level":"1.4","depth":1,"next":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"C11 features in concurrency","level":"1.3","depth":1,"path":"c11-features-in-currency.md","ref":"c11-features-in-currency.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"lock-free-vs-spin-lock.md","mtime":"2017-11-12T17:28:32.793Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-12T17:28:38.607Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"lock-free vs spin-lock","level":"1.4","depth":1,"next":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"previous":{"title":"C11 features in concurrency","level":"1.3","depth":1,"path":"c11-features-in-currency.md","ref":"c11-features-in-currency.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"lock-free-vs-spin-lock.md","mtime":"2017-11-13T02:57:35.171Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-13T02:57:41.283Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
