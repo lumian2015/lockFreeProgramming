@@ -269,80 +269,6 @@ int lfstack_pop(_Atomic lfstack_t *lfstack)
 </code></pre><p>Don&apos;t forget to change the initialization of stack.</p>
 <pre><code>_Atomic lfstack_t top = {0,NULL};
 </code></pre><p>Now, when we run the program again, it will not print any error information. Here is a C library called <strong>liblfds</strong>, <a href="https://www.liblfds.org/" target="_blank">https://www.liblfds.org/</a>, a lock-free data structure library written in C. If you don&apos;t like to write the lock-free data structure by yourself, you could use this C library.</p>
-<p>Let&apos;s compare the lock-free stack with the stack implement by using mutex. Here is the code of the lock-based stack.</p>
-<p>lock_based_stack.c</p>
-<pre><code>#include&lt;stdio.h&gt;
-#include&lt;pthread.h&gt;
-#include&lt;stdlib.h&gt;
-
-typedef struct Node{
-    int data;
-    struct Node *next;
-}Node;
-
-Node *head = NULL;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-void *push(void *input)
-{
-    for(int i=0; i&lt;100000; i++)
-    {
-        Node *node = malloc(sizeof(Node));
-        node-&gt;data = i;
-        pthread_mutex_lock(&amp;mutex);
-        node-&gt;next = head;
-        head = node;
-        //printf(&quot;pushing value %d\n&quot;,node-&gt;data);
-        pthread_mutex_unlock(&amp;mutex);
-    }
-    pthread_exit(NULL);
-}
-
-void *pop(void *input)
-{
-    for(int i=0; i&lt;100000;)
-    {
-        pthread_mutex_lock(&amp;mutex);
-        if(head ==NULL)
-        {
-            //printf(&quot;the stack is empty\n&quot;);
-            pthread_mutex_unlock(&amp;mutex);
-        }
-        else{
-            Node *pop_node = head;
-            head = head-&gt;next;
-            //printf(&quot;poping value %d\n&quot;,pop_node-&gt;data);
-            free(pop_node);
-            i++;
-            pthread_mutex_unlock(&amp;mutex);
-        }
-    }
-    pthread_exit(NULL);
-}
-
-int main()
-{
-    pthread_t tid[200];
-    for(int i=0; i&lt;100; i++)
-        pthread_create(&amp;tid[i],NULL,push,NULL);
-    for(int i=100; i&lt;200; i++)
-        pthread_create(&amp;tid[i],NULL,pop,NULL);
-    for(int i=0; i&lt;200; i++)
-        pthread_join(tid[i],NULL);
-    return 0;
-}
-</code></pre><p>I compare the lock-free stack and lock-based stack by measuring their running time. In order to compare their efficiency, I comment the &quot;printf&quot; statement in both of the programs. I use the built-in command <code>time</code> in linux to measure their running time.</p>
-<p>Here are the average results by running each of them 10 times.</p>
-<p>lock-free stack</p>
-<pre><code>real 0m2.133s
-user 0m6.140s
-sys  0m0.946s
-</code></pre><p>lock-based stack</p>
-<pre><code>real 0m2.730s
-user 0m3.594s
-sys  0m4.907s
-</code></pre><p>From the result, we could see that lock-free stack is more efficient than lock-based stack while doing the same thing.  Actually, if you pay attention to the implementation above, a lock-free stack is logically using a spin lock as well.  Moreover, recall that pthread library&apos;s mutex is also implemented using CAS.  So, why one is faster than the other?</p>
-<p>The answer is, the one that uses CAS to implement is a <strong>direct low-level implementation </strong>that uses CAS instructions, whereas the one that uses pThread is implemented <strong>using the pThread&apos;s library</strong>.  Think about the use of &quot;ls -l | less&quot; vs the use of a GUI file manager to browse a directory.  The former is efficient but primitives, more suitable for advanced users.  The latter is easier and has more overhead (e.g., rendering the GUI).  Similarly, the pThread-based stack is easier to implement (using mutex), higher-level, but incurs syscall overhead within the mutex implementation (e.g., wait() and context switch).  In contrast, the CAS one we presented above is lower-level (almost direct use of CAS instructions), direct (so that involves no sys call), but it is much more cumbersome to implement (e.g., take care of the ABA problem yourself).</p>
-<p>Therefore, lock-free implementation in essence is for advanced developers, especially, system developers, who aim for highest efficiency.  Remember, the lock-free implementation above essentially implements a spin lock <strong>implicitly </strong>and it is &quot;lock-free&quot; just because it is (high-level) <strong>mutex lock </strong>free only.</p>
 
                                 
                                 </section>
@@ -386,7 +312,7 @@ sys  0m4.907s
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"ABA problem","level":"1.6","depth":1,"next":{"title":"Reference","level":"1.7","depth":1,"path":"reference.md","ref":"reference.md","articles":[]},"previous":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"aba-problem.md","mtime":"2017-11-13T06:12:04.563Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-13T06:12:10.027Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"ABA problem","level":"1.6","depth":1,"next":{"title":"Reference","level":"1.7","depth":1,"path":"reference.md","ref":"reference.md","articles":[]},"previous":{"title":"Lock-free Stack","level":"1.5","depth":1,"path":"lock-free-stack.md","ref":"lock-free-stack.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"aba-problem.md","mtime":"2017-12-03T15:11:42.300Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-12-03T15:11:54.382Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
