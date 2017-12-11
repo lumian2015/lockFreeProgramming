@@ -118,7 +118,7 @@ void *counting(void *input)
     {
         unlock_count++;
         while(!atomic_compare_exchange_weak(&lock,&expected,1)) //if the lock is 0(unlock), then set it to 1(lock).
-            expected = 0; //if the CAS fails, the desired will be set to 1, so we need to change it to 0 again.
+            expected = 0; //if the CAS fails, the expected will be set to 1, so we need to change it to 0 again.
         lock_count++; 
         lock = 0;
     }
