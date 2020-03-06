@@ -89,7 +89,7 @@ the value of cnt is 89824 (wrong)
 C11 provides some functions for us to change the content of atomic types like user-defined struct in an atomic way. Here I will introduce the CAS function, which we will use in lock-free data-struct designing.
 
 ```
-_Bool atmoic_compare_exchange_weak(volatile A *object, C *expected, C desired);
+_Bool atomic_compare_exchange_weak(volatile A *object, C *expected, C desired);
 ```
 
 Description: Atomically,  compares the value pointed to by object for equality with that in expected, and if true, replaces the value  pointed to by object with desired, and if false, updates the value in expected with the value pointed to by object. \(Here, **A **means atomic type, while the **C **means the non-atomic type corresponding to **A**, for example, **if A is \_Atomic int , then, C is int**\)
