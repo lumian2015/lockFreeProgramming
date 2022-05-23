@@ -126,7 +126,7 @@ Description: Atomically returns the value pointed to by object.
 
 ```
 _Bool atomic_compare_exchange_strong(volatile A *object, C *expected, C desired);
-_Bool atmoic_compare_exchange_weak(volatile A *object, C *expected, C desired);
+_Bool atomic_compare_exchange_weak(volatile A *object, C *expected, C desired);
 ```
 
 Description: Atomically,  compares the value pointed to by object for equality with that in expected, and if true, replaces the value  pointed to by object with desired, and if false, updates the value in expected with the value pointed to by object.
